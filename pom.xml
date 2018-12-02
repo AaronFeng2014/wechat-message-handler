@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>com.aaron</groupId>
-    <artifactId>spring-cloud-wechat-handler</artifactId>
+    <artifactId>wechat-message-handler</artifactId>
     <packaging>jar</packaging>
 
-    <name>spring-cloud-wechat-handler</name>
+    <name>wechat-message-handler</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
