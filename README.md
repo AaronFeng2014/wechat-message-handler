@@ -38,7 +38,7 @@
        properties配置：
             wechat.config.appConfigList[0].appId=appid
             wechat.config.appConfigList[0].token=token
-            wechat.config.appConfigList[0].encodingAesKeyencodingAesKey=encodingAesKey
+            wechat.config.appConfigList[0].encodingAesKey=encodingAesKey
        
        yml配置：
             wechat:
@@ -46,10 +46,10 @@
                 appConfigList:
                 - appId: appId1
                   token: token1
-                  encodingAesKey: encodingAesKeyencodingAesKey1
+                  encodingAesKey: encodingAesKey1
                 - appId: appId2
                   token: token2
-                  encodingAesKey: encodingAesKeyencodingAesKey2           
+                  encodingAesKey: encodingAesKey2           
       **提示：** 需要包com.aaron.springcloud.wx被spring扫描到
       
 3. Controller实现
