@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="30 second">
+
+    <property name="APP_NAME" value="wecaht-message"/>
+    <property name="LOG_DIRECTORY" value="${user.home}/logs/${APP_NAME}/"/>
+    <property name="FILE_SIZE" value="20MB"/>
+    <property name="MAX_HISTORY" value="100"/>
+    <property name="TOTAL_SIZE" value="1GB"/>
+    <property name="LOG_LEVEL" value="DEBUG"/>
+
+
+    <!-- 控制台打印 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- INFO 输入到文件，按文件大小 -->
+    <appender name="INFO-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_DIRECTORY}/info.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/info%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+            <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR 输入到文件，按文件大小 -->
+    <appender name="ERROR-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_DIRECTORY}/error.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/error%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+            <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- WARN 输入到文件，按文件大小 -->
+    <appender name="WARN-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_DIRECTORY}/warn.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/warn%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+            <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- DEBUG 输入到文件，按文件大小 -->
+    <appender name="DEBUG-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_DIRECTORY}/debug.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/debug%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+        </rollingPolicy>
+    </appender>
+
+    <!-- TRACE 输入到文件，按日期和文件大小 -->
+    <appender name="TRACE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_DIRECTORY}/trace.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/trace%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+        </rollingPolicy>
+    </appender>
+
+
+    <appender name="${APP_NAME}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %m%n</pattern>
+        </encoder>
+        <!-- 过滤日志级别 -->
+        <!--<filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+        <file>${LOG_DIRECTORY}/${APP_NAME}.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIRECTORY}%d/${APP_NAME}%i.log</fileNamePattern>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <maxFileSize>${FILE_SIZE}</maxFileSize>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 包级别的日志 -->
+    <logger name="com.aaron.springcloud.consumer.controller" additivity="false">
+        <level value="{LOG_LEVEL}"/>
+        <appender-ref ref="${APP_NAME}"/>
+
+        <!-- 还是要输出到控制台中-->
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!-- org包下面设置日志级别为Error-->
+    <!--<logger name="org" level="ERROR"/>-->
+
+    <!-- org包下面设置日志级别为Error-->
+    <!--<logger name="com.netflix"  level="ERROR"/>-->
+
+    <!-- Logger 根目录 -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="STDOUT"/>
+
+        <appender-ref ref="ERROR-OUT"/>
+
+        <appender-ref ref="WARN-OUT"/>
+
+        <appender-ref ref="INFO-OUT"/>
+
+        <appender-ref ref="DEBUG-OUT"/>
+
+        <appender-ref ref="TRACE-OUT"/>
+    </root>
+</configuration>
