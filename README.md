@@ -46,10 +46,10 @@
                 appConfigList:
                 - appId: appId1
                   token: token1
-                  encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey1
+                  encodingAesKey: encodingAesKeyencodingAesKey1
                 - appId: appId2
                   token: token2
-                  encodingAesKeyencodingAesKey: encodingAesKeyencodingAesKey2           
+                  encodingAesKey: encodingAesKeyencodingAesKey2           
       **提示：** 需要包com.aaron.springcloud.wx被spring扫描到
       
 3. Controller实现
