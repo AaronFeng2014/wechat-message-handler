@@ -124,9 +124,9 @@ public interface MessageUrl
 
     String GET_USER_INFO_URL = "https://api.weixin.qq.com/cgi-bin/user/info";
 
-    String BATCH_GET_USER_INFO_URL = "https://api.weixin.qq.com/cgi-bin/user/info/batchget";
+    String BATCH_GET_USER_INFO_URL = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=";
 
-    String LISTATTENTUSERURL = "https://api.weixin.qq.com/cgi-bin/user/get";
+    String GET_SUBSCRIBER_OPENID_LIST_URL = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=";
 
     String GETBLACKLISTURL = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist";
 

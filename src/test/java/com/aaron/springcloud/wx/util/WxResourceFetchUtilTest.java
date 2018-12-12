@@ -1,5 +1,6 @@
 package com.aaron.springcloud.wx.util;
 
+import com.aaron.springcloud.wx.config.AppConfig;
 import com.aaron.springcloud.wx.constants.MediaResourceTypeEnum;
 import com.aaron.springcloud.wx.domain.MediaResourceRequest;
 import com.aaron.springcloud.wx.domain.QrCode;
@@ -22,7 +23,7 @@ import java.util.function.Function;
  */
 public class WxResourceFetchUtilTest
 {
-    private String localToken = "15_RsXdQBfwWxYPBCe84ONfH1v7-mlpK-O-Vj8fXXLhKT1xGmx7KRxdEDTJWvHCsAMWd7JeOjJMd9kRq4hQRTmpF1XJeQtsTJjlMCv7481YG0EjCBzTxnoRHy8hPMNET-_jbHQgzRTotCRFcAq0QJEiAIAXQL";
+    private String localToken = "15_k7AhENDNbbyLgZS73cUsTShgBx0_16uKZ2sww1xLYqBgQzfdMSKAgqnhRHIAB5sTHp6-0yrF751HG2Vdobw3beL0_4hXCq4KYUVuTraxOn8EZ_y78N1zmGZXN_NIamsdtvS7OozT_LUtD51VKDBjABAOHF";
 
 
     @Test
@@ -104,6 +105,17 @@ public class WxResourceFetchUtilTest
     @Test
     public void createTemporaryQrCodeWithOutCache()
     {
+
+        AppConfig config = new AppConfig();
+
+        config.setAppId("wx04900607f8d25910");
+        config.setAppSecret("a28d185e02a1519b3699435049550587");
+
+        Function<String, String> accessTokenFun = appId -> WxResourceUtil.getAccessTokenWithoutCache(config);
+
+        QrCode qrCode = new QrCode("wx89d09a8f6a67d75b", "29");
+
+        System.out.println(WxResourceUtil.createTemporaryQrCode(qrCode, accessTokenFun));
     }
 
 
@@ -134,6 +146,8 @@ public class WxResourceFetchUtilTest
     @Test
     public void createTemporaryQrCode1()
     {
+        WxResourceUtil.batchGetUserInfo("wxbc520be9352902bb",
+                                        "16_XJzIeKKW2mU1Rm26AK-2rTSeVMdqgiXU_G1qyqHR6CHEW5DK2NM2JmPbGyBQTj9UngaeNlHQkhiaYPLk63ubRVBJY8k91x_gg-8oiyKZf4uScUxWOuqykPNcoIAy1x3cJK6tqNNzlcKWpVKxNDYbAGASID");
     }
 
 
@@ -162,11 +176,11 @@ public class WxResourceFetchUtilTest
         buttonBean2.setUrl("pages/todayTask/todayTask");
 
         MenuButton.ButtonBean buttonBean3 = new MenuButton.ButtonBean();
-        buttonBean3.setType("click");
+        buttonBean3.setType("view");
         buttonBean3.setName("客服");
-        buttonBean3.setKey("qrCode");
+        buttonBean3.setUrl("https://daka.ximalaya.com/admin/user/mobileQr");
 
-        ImmutableList<MenuButton.ButtonBean> firstMenu = ImmutableList.of(buttonBean2, buttonBean1, buttonBean3);
+        ImmutableList<MenuButton.ButtonBean> firstMenu = ImmutableList.of(buttonBean1, buttonBean2, buttonBean3);
 
         menuButton.setButtons(firstMenu);
 

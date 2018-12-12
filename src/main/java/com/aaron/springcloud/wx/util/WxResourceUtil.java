@@ -14,16 +14,21 @@ import com.aaron.springcloud.wx.domain.QrCode;
 import com.aaron.springcloud.wx.domain.QrCodeCacheItem;
 import com.aaron.springcloud.wx.domain.QrCodeRequest;
 import com.aaron.springcloud.wx.domain.TemporaryQrCodeRequest;
+import com.aaron.springcloud.wx.domain.UserOpenId;
+import com.aaron.springcloud.wx.domain.UserOpenIdList;
 import com.aaron.springcloud.wx.exception.WxException;
 import com.aaron.springcloud.wx.menu.MenuButton;
 import com.aaron.springcloud.wx.message.CostumerMessage;
 import com.aaron.springcloud.wx.message.TemplateMessage;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +49,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 获取微信端资源工具类
@@ -151,6 +158,126 @@ public final class WxResourceUtil extends BaseUtil
 
             return cacheItem.getAccessToken();
         }
+    }
+
+
+    /**
+     * 每次最多拉取100条
+     */
+    public static void batchGetUserInfo(String appId, String accessToken)
+    {
+        String url = MessageUrl.BATCH_GET_USER_INFO_URL + accessToken;
+
+        File file = new File("/Users/fenghaixin/Desktop/out/weixin.sql");
+        //已经拉取的数量
+        int hasFetchTotal = 0;
+        int total = 0;
+
+        int tryCount = 0;
+        do
+        {
+            JSONObject subscribers;
+            try
+            {
+                subscribers = getSubscriberOpenId(accessToken);
+                if (!isSuccess(subscribers))
+                {
+                    continue;
+                }
+
+                total = subscribers.getInteger("total");
+                hasFetchTotal += subscribers.getInteger("count");
+
+                List<UserOpenId> userOpenIds = subscribers.getJSONObject("data")
+                                                          .getJSONArray("openid")
+                                                          .stream()
+                                                          .map(openId -> new UserOpenId(String.valueOf(openId)))
+                                                          .collect(Collectors.toList());
+
+                int size = userOpenIds.size();
+
+                int inTryCount = 0;
+                int fromIndex = 0;
+                int toIndex;
+                do
+                {
+
+                    toIndex = fromIndex + 100 <= size ? fromIndex + 100 : size;
+                    UserOpenIdList userOpenIdList = new UserOpenIdList(userOpenIds.subList(fromIndex, toIndex));
+
+                    HttpEntity<UserOpenIdList> requestEntity = new HttpEntity<>(userOpenIdList, DEFAULT_HEADER);
+
+                    try
+                    {
+                        JSONObject jsonObject = extractResponse(REST_TEMPLATE.postForEntity(url, requestEntity, String.class));
+
+                        if (isSuccess(jsonObject))
+                        {
+                            JSONArray jsonArray = jsonObject.getJSONArray("user_info_list");
+
+                            StringBuilder stringBuilder = new StringBuilder();
+                            jsonArray.forEach(user -> {
+
+                                JSONObject object = (JSONObject)user;
+                                String unionId = object.getString("unionid");
+                                String openId = object.getString("openid");
+                                String nickName = object.getString("nickname");
+                                String headImgUrl = object.getString("headimgurl");
+                                stringBuilder.append(
+                                        "INSERT INTO xmkp_user.WECHAT_USER_INFO (union_id, app_id, open_id, nick_name, head_url) VALUES ('")
+                                             .append(unionId)
+                                             .append("', '")
+                                             .append(appId)
+                                             .append("', '")
+                                             .append(openId)
+                                             .append("', '")
+                                             .append(nickName)
+                                             .append("', '")
+                                             .append(headImgUrl)
+                                             .append("');\n");
+                            });
+
+                            try
+                            {
+                                FileUtils.write(file, stringBuilder.toString(), "utf-8", true);
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    catch (RestClientException e)
+                    {
+                        inTryCount++;
+                    }
+
+                    fromIndex += 100;
+                }
+                while (toIndex < size && inTryCount <= 3);
+
+            }
+            catch (Exception e)
+            {
+                tryCount++;
+            }
+
+        }
+        while (hasFetchTotal < total && tryCount <= 3);
+
+    }
+
+
+    /**
+     * 获取关注用户的openid列表
+     */
+    private static JSONObject getSubscriberOpenId(String accessToken)
+    {
+        String url = MessageUrl.GET_SUBSCRIBER_OPENID_LIST_URL + accessToken;
+
+        ResponseEntity<String> forEntity = REST_TEMPLATE.getForEntity(url, String.class);
+
+        return extractResponse(forEntity);
     }
 
 
@@ -262,7 +389,8 @@ public final class WxResourceUtil extends BaseUtil
      *
      * @return 返回media_id
      */
-    public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource, Function<String, String> accessTokenFun,
+    public static String uploadTemporaryMediaResource(MediaResourceRequest mediaResource,
+                                                      Function<String, String> accessTokenFun,
                                                       CacheItem<MediaCacheItem> mediaCacheRepository)
     {
         //尝试优先从缓存中获取
@@ -345,7 +473,8 @@ public final class WxResourceUtil extends BaseUtil
      *
      * @return 可直接访问的二维码地址
      */
-    public static String createPermanentQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
+    public static String createPermanentQrCode(QrCode qrCode,
+                                               Function<String, String> accessTokenFun,
                                                CacheItem<QrCodeCacheItem> qrCodeCacheRepository)
     {
 
@@ -394,7 +523,8 @@ public final class WxResourceUtil extends BaseUtil
      *
      * @return 可直接访问的二维码地址
      */
-    public static String createTemporaryQrCode(QrCode qrCode, Function<String, String> accessTokenFun,
+    public static String createTemporaryQrCode(QrCode qrCode,
+                                               Function<String, String> accessTokenFun,
                                                CacheItem<QrCodeCacheItem> qrCodeCacheRepository)
     {
         TemporaryQrCodeRequest qrCodeRequest = new TemporaryQrCodeRequest(qrCode.getAppId(), qrCode.getSceneParam());
